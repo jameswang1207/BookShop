@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminNoticeDao">
+        <select id="adminFindNotice" resultType="org.nxum.medicine.entity.Notice">
+             select  id,content,createTime,title from  t_notice
+        </select>
+        
+        <!-- 获取notice的数量 -->
+        <select  id="adminGetNoticeCount"  resultType="Integer">
+            select  count(*)  from  t_notice
+        </select>
+        <!--admin进行notice的搜索  -->
+        <select  id="adminSeacherNotice"  parameterType="String" resultType="org.nxum.medicine.entity.Notice">
+              select  id,content,createTime,title from  t_notice where  title like #{title}
+        </select>
+        <select id="adminSeacherNoticeCount" resultType="Integer">
+               select   count(*)  from  t_notice where  title like #{title}    
+        </select>
+        <!-- 进行公告的删除 -->
+        <select id="adminDeleteNotice" parameterType="Integer">
+             delete   t_notice where  id=#{id}
+        </select>
+        <!-- 检测是否重复 -->
+        <select id="checkNoticeRepeat" parameterType="String" resultType="org.nxum.medicine.entity.Notice">
+          select  id,content,createTime,title from  t_notice where  title=#{title}
+        </select>
+        
+         <!--进行Notice的添加  -->
+         <insert  id="adminAddNotice" parameterType="org.nxum.medicine.entity.Notice" >
+             <selectKey  keyProperty="id" order="BEFORE"  resultType="Integer">
+                select  t_noticeseq.nextval  from  dual    
+             </selectKey>
+                  insert  into  t_notice (id,content,createTime,title) 
+                          values(#{id},#{content},#{createTime},#{title})
+         </insert>
+         
+         <!--进行公告的修改  -->
+        <update id="adminUpdateNotice" parameterType="org.nxum.medicine.entity.Notice">
+               update  t_notice set title=#{title},
+                                content=#{content},
+                                createTime=#{createTime}
+                                where  id=#{id}
+        </update>
+</mapper>

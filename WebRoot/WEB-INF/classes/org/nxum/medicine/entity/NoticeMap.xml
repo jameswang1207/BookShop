@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.NoticesDao">
+     <select id="findAll"  resultType="org.nxum.medicine.entity.Notice">
+      select  id,content,createTime,title  from  t_notice
+     </select>
+     
+     <select id="findByTitle"  resultType="org.nxum.medicine.entity.Notice" parameterType="String">
+      select  content,createTime,title  from  t_notice where title=#{title}
+     </select>
+</mapper>

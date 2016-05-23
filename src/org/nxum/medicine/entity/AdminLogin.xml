@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminLoginDao">
+     <select id="findByAdminUser" resultType="org.nxum.medicine.entity.User" parameterType="String">
+             select
+               userName,password,status
+             from  t_user  where  username=#{userName}
+     </select>
+     
+     <!--admin管理用户信息 -->
+      <select  id="adminAllUser"  parameterType="org.nxum.medicine.entity.AdminPageBean"  resultType="org.nxum.medicine.entity.User">
+         select id,address,birthday,idCard,email,mobile,password ,gender,status,trueName,userName  from    
+         (select   rownum ron,p.* from  (   
+         select  id,address,birthday,idCard,email,mobile,password ,gender,status,trueName,userName
+                  from  t_user  where  status='1') p) where  ron&gt;#{start,jdbcType=INTEGER} and ron&lt;#{end,jdbcType=INTEGER}
+      </select>
+      
+      <!-- 查询管理中的用户的数据 -->
+      <select id="getAdminUserCount" resultType="Integer">
+           select  count(*)  from  t_user where  status='1'
+      </select>
+      <!--按用户名查找用户  -->
+      <select  id="adminSearchUserName"  parameterType="String" resultType="org.nxum.medicine.entity.User">
+         select 
+            id,address,birthday,idCard,email,mobile,password ,gender,status,trueName,userName
+            from  t_user  where    status='1' and userName=#{userName}
+      </select>
+      
+      <!-- admin删除它选中的用户 -->
+      <delete  id="adminDeleteUser" parameterType="Integer">
+             delete  t_user  where  id=#{id}
+      </delete>
+      
+      <!--admin进行用户信息的添加  -->
+      <insert id="adminAddUser" parameterType="org.nxum.medicine.entity.User">
+          <selectKey keyProperty="id" order="BEFORE"  resultType="Integer" >
+             select  t_userseq.nextval from  dual  
+          </selectKey> 
+         insert  into  t_user(id,address,birthday,idCard,email,mobile,password ,gender,status,trueName,userName)
+         values(#{id},#{address},#{birthday},#{idCard},#{email},#{mobile},#{password},#{gender},1,#{trueName},#{userName})
+      </insert>
+      
+</mapper>

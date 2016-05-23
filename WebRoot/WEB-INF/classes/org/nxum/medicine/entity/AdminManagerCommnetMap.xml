@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminCommentDao">
+<!-- 进行用户的留言的管理 -->
+       <select  id="adminFindComment"
+          parameterType="org.nxum.medicine.entity.AdminPageBean"
+          resultType="org.nxum.medicine.entity.AdminComment">
+               select  *  from (
+                             select  rownum  ron,p.*  from 
+                            (select id,content,createTime,personName,replyContent,replyTime from  t_comment) p)
+              where    ron&gt;#{start} and  ron&lt;#{end}
+          </select>
+<!--进行留言总数的查询  -->
+     <select  id="adminCommentCount" resultType="Integer">
+            select   count(*)  from  t_comment
+     </select>
+     
+     <select id="adminSeacherComment" parameterType="String"  resultType="org.nxum.medicine.entity.AdminComment">
+       select id,content,createTime,personName,replyContent,replyTime from  t_comment where  personName=#{personName}
+     </select>
+     
+ <!-- 留言信息的回复-->    
+      <update id="adminReplyUser" parameterType="org.nxum.medicine.entity.AdminComment">
+       update   t_comment  set  replyContent=#{replyContent},
+                                replyTime=#{replyTime}
+                                where  id=#{id} 
+      </update> 
+ <!--进行用户留言的删除 -->     
+      <delete  id="adminDeleteComment"  parameterType="Integer">
+            delete  t_comment  where  id=#{id}
+      </delete>
+</mapper>

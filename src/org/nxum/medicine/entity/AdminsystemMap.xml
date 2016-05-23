@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminSystemDao">
+		 <select id="confirmOldPassword" parameterType="String" resultType="org.nxum.medicine.entity.User">
+		  select  *  from  t_user  where status='2' and  password=#{password} 
+		</select>
+		
+		<update id="adminUpdatePassword" parameterType="String">
+		      update   t_user  set  password=#{password}  where  status='2'
+		</update>
+</mapper>

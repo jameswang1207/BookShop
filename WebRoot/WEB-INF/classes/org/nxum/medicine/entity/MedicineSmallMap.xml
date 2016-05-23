@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.MedicineSmallTypeDao">
+    <select id="findAll"  resultType="org.nxum.medicine.entity.MedicineSmalltype">
+     select  s.id,s.name,s.remarks,s.bigTypeId from  t_smallType s inner  join t_bigtype b  on(s.bigTypeId=b.id)    
+    </select>
+    
+    <!-- 按名字查询小商品的id，用于查询小商品的条数 -->
+    <select id="getSmallTypeId"  parameterType="String" resultType="Integer">
+         select   id   from  t_smallType   where  name=#{name,jdbcType=NUMERIC}
+    </select>
+    
+    <!-- 按名字查询小商品 -->
+    <select  id="finMedicineSmallNameList" parameterType="org.nxum.medicine.view.entity.ResultSmallProduct" resultType="org.nxum.medicine.view.entity.ResultSmallProduct">
+                  select  *  from 
+                 (select  rownum rom,p.*  from (
+select r.id,r.description,r.hot,r.hotTime,r.name,r.price,r.picture,r.specialPrice,r.specialPriceTime,r.stock,r.bigtypeId,r.smallTypeId,s.name smallName 
+                from t_product r inner  join t_smallType s on (s.id=r.smallTypeId)
+                where s.name=#{smallName}) p)
+                 where  rom&gt;#{start} and rom&lt;#{end}
+    </select>
+    
+</mapper>

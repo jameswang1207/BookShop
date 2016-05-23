@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.CommentDao">
+      <select id="getCommentRowCount" resultType="Integer">
+           select  count(*)  from t_comment
+      </select>
+
+      <select id="findAllComment"  parameterType="org.nxum.medicine.entity.Comment"  resultType="org.nxum.medicine.entity.Comment">
+        select  *  from 
+                 (select  rownum rom,p.*  from (
+                 select id,content,createTime,personName,replyContent,replyTime from t_comment) p)
+        where  rom&gt;#{start} and rom&lt;#{end}
+      </select>
+      <!--保存留言  -->
+      <insert id="saveComment" parameterType="org.nxum.medicine.entity.Comment">
+         <selectKey keyProperty="id" order="BEFORE"  resultType="Integer" >
+             select  t_commentseq.nextval from  dual  
+          </selectKey>
+       insert into t_comment(id,content,createTime,personName,replyContent,replyTime)
+           values(#{id},#{content},#{createTime},#{personName},null,null)  
+      </insert>
+</mapper>

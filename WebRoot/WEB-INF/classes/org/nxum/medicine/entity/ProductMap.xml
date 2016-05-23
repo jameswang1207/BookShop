@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.ProductDao">
+         <!-- 查出热卖的产品 -->
+         <select id="findHotAll" resultType="org.nxum.medicine.entity.Product" >
+             select  id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,
+             stock from t_product where  hot=1   order by  hotTime  desc 
+         </select>
+         
+         <!--查出特价产品  -->
+         <select id="findSpricalAll" resultType="org.nxum.medicine.entity.Product" >
+             select  id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,
+             stock from t_product where  specialPrice=1  order by specialPriceTime desc   
+         </select>
+         
+         <!--  按条件查询一共有多少条数据-->
+         <select id="getRowCount" parameterType="Integer" resultType="Integer" >
+             select   count(*)  from  t_product  where   bigtypeId=#{bigtypeId} 
+         </select>
+         <!--按商品的大类信息显示商品的种类，并进行分页处理  -->
+         <select id="findProductTigTypeList"
+           parameterType="org.nxum.medicine.entity.Product"
+           resultType="org.nxum.medicine.entity.Product">
+           select  *  from 
+                 (select  rownum rom,p.*  from (
+select id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,stock,bigtypeId,smallTypeId  from t_product
+               where bigtypeId=#{bigtypeId}) p)
+                 where  rom&gt;#{start} and rom&lt;#{end}   
+         </select> 
+         
+         <!-- 用来显示小商品的条数 -->
+         <!--  按条件查询一共有多少条数据-->
+         <select id="getSmallTypeRowCount" parameterType="Integer" resultType="Integer" >
+             select   count(*)  from  t_product  where   smallTypeId=#{smallTypeId} 
+         </select>
+         <!-- 用来显示小商品的种类信息，并进行分页 -->
+         <select id="findMedicineSmallTypeList"
+           parameterType="org.nxum.medicine.entity.Product"
+           resultType="org.nxum.medicine.entity.Product">
+           select  *  from 
+                 (select  rownum rom,p.*  from (
+select id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,stock,bigtypeId,smallTypeId  from t_product
+               where smallTypeId=#{smallTypeId}) p)
+                 where  rom&gt;#{start} and rom&lt;#{end}   
+         </select>
+         
+         <!-- 用来操作Search功能的select -->
+         <select id="getSmallNameRowCount" parameterType="String" resultType="Integer">
+              select   count(*)  from  t_product  where   name=#{name} 
+         </select>
+         <!-- 用来查询小商品的类别，按名字查询 -->
+         <select id="finMedicineSmallNameList"
+           parameterType="org.nxum.medicine.entity.Product"
+           resultType="org.nxum.medicine.entity.Product">
+           select  *  from 
+                 (select  rownum rom,p.*  from (
+select id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,stock,bigtypeId,smallTypeId  from t_product
+                 where name=#{name}) p)
+                 where  rom&gt;#{start} and rom&lt;#{end}   
+         </select>
+         
+         <!--通过商品的名字查询商品 -->
+         <select id="findMedicineById" parameterType="Integer" resultType="org.nxum.medicine.entity.Product">
+             select  id,description,hot,hotTime,name,price,picture,specialPrice,specialPriceTime,smallTypeId,bigtypeId,
+              stock from t_product where  id=#{id}   
+         </select>
+</mapper>
+

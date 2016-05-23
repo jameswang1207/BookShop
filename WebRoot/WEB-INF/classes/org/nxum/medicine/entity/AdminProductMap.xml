@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminProductDao">
+         <select id="adminFindAllProduct" parameterType="org.nxum.medicine.entity.AdminPageBean"
+                  resultType="org.nxum.medicine.view.entity.AdminProductResult">
+  select  *  from 
+       (select  rownum ron,p.* from 
+             (select
+                   t_product.id productId,description,hot,hotTime,t_product.name productName,
+                   price,picture,specialPrice,specialPriceTime,stock,t_bigtype.name bigtypeName,
+                   t_smallType.name smallTypeName from   t_product left  outer join t_bigtype  on (t_product.bigtypeId=t_bigtype.id)
+                   left  outer  join t_smallType on(t_product.smalltypeId=t_smallType.id)) p) 
+                   where  ron&gt;#{start,jdbcType=INTEGER} and ron&lt;#{end,jdbcType=INTEGER}
+         </select> 
+         
+         <select id="getAdminProductCount" resultType="Integer">
+           select  count(*)  from 
+                  (select
+                   t_product.id productId,description,hot,hotTime,t_product.name productName,
+                   price,picture,specialPrice,specialPriceTime,stock,t_bigtype.name bigtypeName,
+                   t_smallType.name smallTypeName from   t_product left  outer join t_bigtype  on (t_product.bigtypeId=t_bigtype.id)
+                   left  outer  join t_smallType on(t_product.smalltypeId=t_smallType.id))
+         </select>
+         
+         <select id="adminSerachAllProduct" resultType="org.nxum.medicine.view.entity.AdminProductResult"
+                parameterType="org.nxum.medicine.view.entity.AdminSearchProductParamete">
+                 select  *  from 
+					(select  rownum ron,p.* from 
+					(select
+					t_product.id productId,description,hot,hotTime,t_product.name productName,
+					price,picture,specialPrice,specialPriceTime,stock,t_bigtype.name bigtypeName,t_smallType.name smallTypeName
+				    from   t_product left  outer join t_bigtype  on (t_product.bigtypeId=t_bigtype.id)
+					left  outer  join t_smallType on(t_product.smalltypeId=t_smallType.id)) p 
+					where productName  like #{productName}) where ron&gt;#{start,jdbcType=INTEGER} and ron&lt;#{end,jdbcType=INTEGER}
+         </select>
+         
+         <select id="getAdminSearchCount" resultType="Integer" parameterType="org.nxum.medicine.view.entity.AdminSearchProductParamete">
+           select  count(*)  from 
+                  (select
+                   t_product.id productId,description,hot,hotTime,t_product.name productName,
+                   price,picture,specialPrice,specialPriceTime,stock,t_bigtype.name bigtypeName,
+                   t_smallType.name smallTypeName from   t_product left  outer join t_bigtype  on (t_product.bigtypeId=t_bigtype.id)
+                   left  outer  join t_smallType on(t_product.smalltypeId=t_smallType.id)) where productName  like #{productName}
+         </select> 
+         
+         <select id="adminFindAllProductBig" resultType="org.nxum.medicine.entity.MedicineBigType">
+             select id,name,remarks  from  t_bigtype
+         </select>
+         
+         <select id="adminFindAllProductSmall" parameterType="Integer" resultType="org.nxum.medicine.entity.MedicineSmalltype">
+             select id,name,remarks  from  t_smallType where  bigTypeId=#{bigTypeId}
+         </select>
+          
+          <!-- 产品名的校验 -->
+          <select id="ajaxCheckProductName" parameterType="String" resultType="org.nxum.medicine.entity.Product">
+                  select  *  from  t_product  where   name=#{name}
+          </select>
+          <!-- 进行商品的添加 -->
+          <insert id="adminAddProduct" parameterType="org.nxum.medicine.entity.Product">
+          <selectKey keyProperty="id" order="BEFORE"  resultType="Integer" >
+             select  t_productseq.nextval from  dual  
+          </selectKey> 
+      insert  into  
+      t_product(id,description,name,price,picture,stock,smallTypeId,bigtypeId,hot,hotTime,specialPrice,specialPriceTime)
+       values(#{id},#{description},#{name},#{price},#{picture},#{stock},#{smallTypeId},#{bigtypeId},#{hot},#{hotTime},#{specialPrice},#{specialPriceTime})
+      </insert>
+      
+      <!-- 进行商品的删除 -->
+     <delete  id="adminDeleteProduct" parameterType="Integer">
+             delete  t_product  where  id=#{id}
+     </delete>
+      
+      <!--进行商品有图片的信息的修改  -->
+      <update id="adminUpdateProduct" parameterType="org.nxum.medicine.entity.Product">
+       update t_product set description=#{description},
+                            name=#{name},
+                            price=#{price},
+                            picture=#{picture},
+                            stock=#{stock},
+                            smallTypeId=#{smallTypeId},
+                            bigtypeId=#{bigtypeId}
+                       where  id=#{id}      
+      </update>
+      <!--进行商品没有图片的信息的修改  -->
+      <update id="adminNotUpdateProduct" parameterType="org.nxum.medicine.entity.Product">
+       update t_product set description=#{description},
+                            name=#{name},
+                            price=#{price},
+                            stock=#{stock},
+                            smallTypeId=#{smallTypeId},
+                            bigtypeId=#{bigtypeId}
+                    where  id=#{id}      
+      </update>
+      
+      <!--进行热卖商品的设置 -->
+      <update id="adminSethotProduct" parameterType="org.nxum.medicine.entity.Product">
+       update t_product set hot=#{hot},
+                            hotTime=#{hotTime}
+                    where  id=#{id}      
+      </update>
+      <!--进行特价商品的设置  -->
+      <update id="adminSetSProduct" parameterType="org.nxum.medicine.entity.Product">
+       update t_product set specialPrice=#{specialPrice},
+                            specialPriceTime=#{specialPriceTime}
+                    where  id=#{id}      
+      </update>
+</mapper>
+

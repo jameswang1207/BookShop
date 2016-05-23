@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminBigProductDao">
+	<select id="adminFindBigProduct" parameterType="org.nxum.medicine.entity.AdminPageBean"
+		resultType="org.nxum.medicine.entity.MedicineBigType">
+		select * from (
+		select rownum ron,p.* from
+		(select
+		id,name,remarks from t_bigtype) p)
+		where ron&gt;#{start} and
+		ron&lt;#{end}
+	</select>
+
+	<!--进行大商品的数量计算 -->
+	<select id="adminGetBigProductCount" resultType="Integer">
+		select count(*)
+		from t_bigtype
+	</select>
+
+	<!-- 按名字进行商品大类的查询 -->
+	<select id="adminSeacherBigProduct"
+		parameterType="org.nxum.medicine.view.entity.AdminSeacherBigProduct"
+		resultType="org.nxum.medicine.entity.MedicineBigType">
+		select * from (
+		select rownum ron,p.* from
+		(select
+		id,name,remarks from t_bigtype where name like #{bigProductName}) p)
+		where ron&gt;#{start} and ron&lt;#{end}
+	</select>
+
+	<!--seacherProduct的Count -->
+	<select id="adminSeacherBigProductCount" parameterType="String"
+		resultType="Integer">
+		select count(*) from t_bigtype where name like #{name}
+	</select>
+
+	<!--进行bigProduct名的检测 -->
+	<select id="adminCheckBigProductName" parameterType="String"
+		resultType="org.nxum.medicine.entity.MedicineBigType">
+		select id,name,remarks from t_bigtype where name=#{name}
+	</select>
+	<!-- 进行商品大类的添加 -->
+	<insert id="adminAddBigProduct" parameterType="org.nxum.medicine.entity.MedicineBigType">
+		<selectKey keyProperty="id" order="BEFORE" resultType="Integer">
+			select t_bigtypeseq.nextval from dual
+		</selectKey>
+		insert into t_bigtype (id,name,remarks)
+		values(#{id},#{name},#{remarks})
+	</insert>
+
+	<!-- 进行商品的更该操作 -->
+	<update id="adminUpdateBigProduct" parameterType="org.nxum.medicine.entity.MedicineBigType">
+		update
+		t_bigtype set remarks=#{remarks} where id=#{id}
+	</update>
+
+	<!--进行商品大类的删除 -->
+	<delete id="adminDeleteBigProduct" parameterType="Integer">
+		delete
+		t_bigtype where id=#{id}
+	</delete>
+	<!-- 查询有无商品小类的关联 -->
+	<select id="adminCheckRelatedSmallProdouct" parameterType="Integer"
+		resultType="org.nxum.medicine.entity.MedicineSmalltype">
+		select id,name,remarks,bigTypeId from t_smallType where
+		bigTypeId=#{id}
+	</select>
+</mapper>
+

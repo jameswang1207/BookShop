@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.OrderDao">
+	<!-- 先要保存order,用这种方式可以方便的获得当前的id值 -->
+	<insert id="saveOrder" parameterType="org.nxum.medicine.entity.Order">
+		<selectKey keyProperty="id" order="BEFORE" resultType="Integer">
+			select t_orderseq.nextval from dual
+		</selectKey>
+		insert into t_order(id,cost,createTime,orderNo,status,userId)
+		values(#{id},#{cost},#{createTime},#{orderNo},#{status},#{userId})
+	</insert>
+
+	<!--先再保存order_Product -->
+	<insert id="saveOrderProduct" parameterType="org.nxum.medicine.entity.OrderProduct">
+		<selectKey keyProperty="id" order="BEFORE" resultType="Integer">
+			select t_order_productseq.nextval from dual
+		</selectKey>
+		insert into t_order_product (id,num,orderId,productId)
+		values(#{id},#{num},#{orderId},#{productId})
+	</insert>
+
+	<!-- 进行订单的查询 -->
+	<select id="findcurrentUserOrder" resultMap="orderResult"
+		parameterType="org.nxum.medicine.view.entity.OrderParameterUserIdOrOrderNo">
+		select
+		t_order.userId,
+		t_order.cost,
+		t_order.createTime,
+		t_order.orderNo,
+		t_order.status,
+		t_order_product.num as productCount,
+		t_product.name,
+		t_product.description,
+		t_product.hot,
+		t_product.price,
+		t_product.picture,
+		t_product.specialPrice,
+		t_product.specialPriceTime,
+		t_product.stock,
+		t_product.bigtypeId,
+		t_product.smallTypeId
+		from t_order
+		left outer join t_order_product on
+		(t_order.id=t_order_product.orderId)
+		left outer join t_product on
+		(t_order_product.productId=t_product.id)
+		<where>
+			<if test="userId!=null">
+				userId=#{userId}
+			</if>
+			<if test="orderNo!=null">
+				and orderNo=#{orderNo}
+			</if>
+		</where>
+		order by createTime
+	</select>
+	<resultMap id="orderResult"
+		type="org.nxum.medicine.view.entity.UpdateOrderEntity">
+		<result property="cost" column="cost" />
+		<result property="createTime" column="createTime" />
+		<result property="orderNo" column="orderNo" />
+		<result property="status" column="status" />
+		<result property="userId" column="userId" />
+		<collection property="products"
+			ofType="org.nxum.medicine.view.entity.UpdateCartOfProduct">
+			<result property="description" column="description" />
+			<result property="hot" column="hot" />
+			<result property="hotTime" column="hotTime" />
+			<result property="name" column="name" />
+			<result property="price" column="price" />
+			<result property="picture" column="picture" />
+			<result property="specialPrice" column="specialPrice" />
+			<result property="specialPriceTime" column="specialPriceTime" />
+			<result property="stock" column="stock" />
+			<result property="bigtypeId" column="bigtypeId" />
+			<result property="smallTypeId" column="smallTypeId" />
+			<result property="productCount" column="productCount" />
+		</collection>
+	</resultMap>
+	<!-- 修改订单中的status,使他处于收获状态 -->
+	<update id="updateStatus" parameterType="String">
+		update t_order set
+		status='4' where orderNo=#{orderNo}
+	</update>
+</mapper>

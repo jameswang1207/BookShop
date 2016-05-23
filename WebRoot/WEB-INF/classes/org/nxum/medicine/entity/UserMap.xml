@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.UserDao">
+      <!--插入用户信息  -->
+      <insert id="saveUser" parameterType="org.nxum.medicine.entity.User">
+          <selectKey keyProperty="id" order="BEFORE"  resultType="Integer" >
+             select  t_userseq.nextval from  dual  
+          </selectKey> 
+      insert  into  t_user(id,address,birthday,idCard,email,mobile,password ,gender,status,trueName,userName)
+      values(#{id},#{address},#{birthday},#{idCard},#{email},#{mobile},#{password},#{gender},1,#{trueName},#{userName})
+      </insert>
+      
+      <!-- 检测用户信息通过用户名和电话号码进行校验 -->
+      <select id="existUserNameAndMobile" resultType="Integer" parameterType="org.nxum.medicine.entity.User" >
+         select   id   from  t_user 
+          <where>
+            <if test="userName!=null">
+                username=#{userName}
+            </if>
+            <if test="mobile!=null">
+                mobile=#{mobile}
+            </if>        
+          </where>
+      </select>
+      
+      <!--用户的登陆  -->
+      <select id="findByUserName" resultType="org.nxum.medicine.entity.User" parameterType="String">
+        select  *  from t_user where username=#{userName}
+      </select>
+      
+      <update id="updateUser" parameterType="org.nxum.medicine.entity.User">
+       update t_user set address=#{address},birthday=#{birthday},idCard=#{idCard},email=#{email},mobile=#{mobile},
+       password=#{password},gender=#{gender},status=#{status},trueName=#{trueName},userName=#{userName} where id=#{id} 
+      </update>
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+	http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+      <!--配置连接 -->
+     <bean  name ="myDataSource"  class="org.apache.commons.dbcp.BasicDataSource">  
+      <property  name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+      <property  name="username"  value ="oracle"></property>
+      <property  name="password"  value ="oracle"></property>
+      <property  name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:xe"/>
+     </bean>
+    <!-- 配置sqlsessionFactoryBean ，启动mybatis框架，使用的包是Spring与mybatis的那个扎报-->
+   <bean id="sqsessionFactoryBean"  class="org.mybatis.spring.SqlSessionFactoryBean">
+      <property  name="dataSource"  ref="myDataSource"/>
+      <property  name="mapperLocations" value="classpath:org/nxum/medicine/entity/*.xml"/>
+   </bean>
+    <!--用你的mapperscannerConfig里生成你的dao实例, 这里使用的是动态代理，将动态的生成你要的子类 实例 -->
+   <bean   class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+     <property  name="basePackage"  value="org.nxum.medicine.dao"/>
+     <!-- 自定义一个扫描注解mybatis -->
+     <property  name="annotationClass"  value="org.nxum.medicine.util.MybatisDao"/>  
+   </bean>
+   <!-- 添加一个支持文件上传的bean组件 -->
+   <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+   <!--添加组件扫描器  -->
+    <context:component-scan base-package="org.nxum.medicine"/>
+    <mvc:annotation-driven/>
+    <!-- 支持静态js,css的通过，不进行拦截 -->
+    <mvc:default-servlet-handler/>
+    <!--添加对事物的处理  -->
+    <bean id="txManger" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <!-- 事物只能靠连接才起作用，所以应注入一个属性 -->
+    <property name="dataSource" ref="myDataSource"/>
+    </bean>
+    <!--用来启动这个注解来支持@transaction-->
+    <!-- 添加视图解析器 -->
+    <bean  id="viewResolver"  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+      <property  name="prefix"  value="/WEB-INF/jsp/"/>
+      <property  name="suffix"    value=".jsp"/>
+      </bean>
+</beans>
+
+
+
+

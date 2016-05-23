@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.nxum.medicine.dao.AdminSmallProductDao">
+      <select id="adminFindAllSmallProduct"
+       parameterType="org.nxum.medicine.entity.AdminPageBean"
+       resultType="org.nxum.medicine.view.entity.AdminSmallProductResult">
+               select  *  from (
+                              select  rownum  ron,p.*  from 
+                             (select t_smallType.id smallProductId,
+                              t_smallType.name smallProductName,
+                              t_smallType.remarks smallProductRemarks,
+                              bigTypeId,
+                              t_bigtype.name bigProductName  
+                             from  t_smallType left outer join t_bigtype on(t_smallType.bigTypeId=t_bigtype.id)  ) p)
+              where    ron&gt;#{start} and  ron&lt;#{end}
+      </select>
+      
+      <select id="adminGetSmallProductCount" resultType="Integer">
+               select  count(*)   from  t_smallType left outer join t_bigtype on (t_smallType.bigTypeId=t_bigtype.id) 
+      </select>
+      
+      <select id="adminSeacherSmallProduct"
+       parameterType="org.nxum.medicine.view.entity.AdminSeacherSmallProduct"
+       resultType="org.nxum.medicine.view.entity.AdminSmallProductResult">
+               select  *  from (
+                              select  rownum  ron,p.*  from 
+                             (select t_smallType.id smallProductId,
+                              t_smallType.name smallProductName,
+                              t_smallType.remarks smallProductRemarks,
+                              bigTypeId,
+                              t_bigtype.name bigProductName  
+                             from  t_smallType left outer join t_bigtype on(t_smallType.bigTypeId=t_bigtype.id) ) p
+                              where   smallProductName  like #{smallProductName} )
+              where    ron&gt;#{start} and  ron&lt;#{end}
+      </select>
+      
+      <select  id="adminSeacherSmallProductCount" resultType="Integer">
+     select count(*) from (
+                  select t_smallType.id smallProductId,
+                              t_smallType.name smallProductName,
+                              t_smallType.remarks smallProductRemarks,
+                              bigTypeId,
+                              t_bigtype.name bigProductName  
+     from  t_smallType left outer join t_bigtype on(t_smallType.bigTypeId=t_bigtype.id) ) where   smallProductName  like  #{smallProductName}
+      </select>
+      
+      <select id="adminSmallProductRepeat"  parameterType="String" resultType="org.nxum.medicine.entity.MedicineSmalltype">
+          select  id,name,remarks,bigTypeId  from t_smallType  where name=#{name} 
+      </select>
+      
+      <!-- 进行商品小类的添加 -->
+      <insert id="adminAddSmallProduct"  parameterType="org.nxum.medicine.entity.MedicineSmalltype">
+          <selectKey  keyProperty="id" order="BEFORE"  resultType="Integer">
+                select  t_smallTypeseq.nextval  from  dual    
+             </selectKey>
+       insert  into  t_smallType (id,name,remarks,bigTypeId) values(#{id},#{name},#{remarks},#{bigTypeId}) 
+      </insert>
+      
+      <!--进行商品小类的修改  -->
+      <update id="adminUpdateSmallProduct" parameterType="org.nxum.medicine.entity.MedicineSmalltype">
+           update  t_smallType set bigTypeId=#{bigTypeId},remarks=#{remarks}  where  id=#{id}
+      </update>
+      <!--进行商品的删除  -->      
+      <delete id="adminDeleteSmallProduct" parameterType="Integer">
+           delete   t_smallType  where  id=#{id}
+      </delete>
+      
+       <!-- 查询是否有商品进行商品大类的关联 -->
+         <select id="adminCheckRelatedProduct" parameterType="Integer" resultType="org.nxum.medicine.entity.Product">
+          select id,description,hot,hotTime,name,price,picture,
+                 specialPrice,specialPriceTime,stock,bigtypeId,smallTypeId 
+          from t_product where bigtypeId=#{id}
+         </select>
+</mapper>
